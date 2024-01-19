@@ -4,7 +4,7 @@
 
 SELECT 
 first_name, last_name, email
-FROM customer
+FROM customer;
 
 -- Challenge: ORDER BY
 -- The Marketing Manager asks you to order the customer list by the last name.
@@ -15,12 +15,12 @@ FROM customer
 SELECT 
 first_name, last_name
 FROM customer
-ORDER BY last_name DESC, first_name DESC
+ORDER BY last_name DESC, first_name DESC;
 
 SELECT 
 first_name, last_name 
 FROM customer
-ORDER BY 2 DESC, 1 DESC -- 2: Second column, 1: first_colum in the query
+ORDER BY 2 DESC, 1 DESC; -- 2: Second column, 1: first_colum in the query
 
 -- Challenge: SELECT DISTINCT
 -- A marketing team member asks you about the different prices that have been paid
@@ -29,28 +29,28 @@ ORDER BY 2 DESC, 1 DESC -- 2: Second column, 1: first_colum in the query
 SELECT DISTINCT
 amount
 FROM payment
-ORDER BY amount DESC
+ORDER BY amount DESC;
 
 -- Challenge: For Today
 
 -- 1) Create a list of all the distinct districts customers are from.
 SELECT DISTINCT
 district
-FROM address
+FROM address;
 
 -- 2) What is the latest rental date?
 SELECT
 rental_date
 FROM rental
 ORDER BY rental_date DESC
-LIMIT 10
+LIMIT 10;
 
 -- 3) How many films does the company have?
 SELECT 
 COUNT(title)
-FROM film
+FROM film;
 
 -- 4) How many distinct last names of the customers are there?
 SELECT DISTINCT
 COUNT(last_name)
-FROM customer
+FROM customer;
