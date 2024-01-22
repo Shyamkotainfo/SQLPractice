@@ -77,3 +77,54 @@ FROM payment;
 -- Correlations subqueries in WHERE
 -- Show only those movie titles, their associate film_id and replacement_cost
 -- with the lowest replacement_costs for in each rating category - also show the rating
+SELECT title, film_id, replacement_cost, rating
+FROM film f1
+WHERE replacement_cost =  (
+SELECT MIN(replacement_cost) FROM film f2
+WHERE f1.rating = f2.rating);
+
+-- Show only those movies titles, their associated film_id and the length that have
+-- the highest length in each rating category - also show the rating.
+SELECT title, film_id, length, rating
+FROM film f1
+WHERE length =  (
+SELECT MAX(length) FROM film f2
+WHERE f1.rating = f2.rating);
+
+-- Challenge: Correlations suqueries in SELECT
+-- Show all the payments plus the total amount for every customer as well as the 
+-- number of payments of each customer
+SELECT *, 
+(SELECT SUM(amount) FROM payment p2
+WHERE p1.customer_id = p2.customer_id),
+(SELECT COUNT(amount) FROM payment p2
+WHERE p1.customer_id = p2.customer_id)
+FROM payment p1
+ORDER BY customer_id;
+
+-- Show only those films with the highest replacement costs in their rating category
+-- plus show the average replacement cost in their category.
+SELECT title, replacement_cost, rating,
+(SELECT AVG(replacement_cost) FROM film f2
+WHERE f1.rating = f2.rating)
+FROM film f1
+WHERE replacement_cost = (SELECT MAX(replacement_cost)
+						  FROM film f3
+						 WHERE f1.rating = f3.rating);
+
+-- Show only those payments with the highest payment for each customer's first name-
+-- including the payment_id of that payment
+SELECT first_name, amount, payment_id
+FROM payment p1
+INNER JOIN customer c
+ON p1.customer_id = c.customer_id
+WHERE amount = 
+(SELECT MAX(amount) FROM payment p2
+WHERE p1.customer_id = p2.customer_id);
+
+-- How would you solve it if you would not need to see the payment_id?
+SELECT first_name, MAX(amount)
+FROM payment p1
+INNER JOIN customer c
+ON p1.customer_id = c.customer_id
+GROUP BY first_name;
