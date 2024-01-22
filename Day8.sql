@@ -156,7 +156,10 @@ Task: Create an overview of the addresses that are not associated to any custome
 Question: How many addresses are that?
 Answer: 4
 */
-
+SELECT COUNT(*) FROM address a
+LEFT JOIN customer b
+ON a.address_id = b.address_id
+WHERE b.address_id is null;
 
 /*
 Question 7:
@@ -171,6 +174,18 @@ Question: What city is that and how much is the amount?
 
 Answer: Cape Coral with a total amount of 221.55
 */
+SELECT 
+city, SUM(amount)
+FROM payment a
+INNER JOIN customer b
+ON a.customer_id = b.customer_id
+INNER JOIN address c
+ON b.address_id = c.address_id
+INNER JOIN city d
+ON c.city_id = d.city_id
+GROUP BY city
+ORDER BY 2 DESC
+LIMIT 1;
 
 /*
 Question 8:
@@ -185,6 +200,21 @@ Question: Which country, city has the least sales?
 
 Answer: United States, Tallahassee with a total amount of 50.85.
 */
+SELECT 
+country, city, SUM(amount)
+FROM payment a
+INNER JOIN customer b
+ON a.customer_id = b.customer_id
+INNER JOIN address c
+ON b.address_id = c.address_id
+INNER JOIN city d
+ON c.city_id = d.city_id
+INNER JOIN country e
+ON d.country_id = e.country_id
+GROUP BY country, city
+ORDER BY 3 ASC
+LIMIT 1;
+
 
 /*
 Question 9:
@@ -199,6 +229,14 @@ Question: Which staff_id makes on average more revenue per customer?
 
 Answer: staff_id 2 with an average revenue of 56.64 per customer.
 */
+
+SELECT staff_id, 
+ROUND(AVG(revenue), 2)
+FROM (SELECT staff_id, customer_id, SUM(amount) as revenue 
+	  FROM payment GROUP BY customer_id, staff_id)
+GROUP BY staff_id
+ORDER BY 1 DESC
+LIMIT 1;
 
 /*
 Question 10:
