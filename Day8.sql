@@ -9,7 +9,8 @@ Task: Create a list of all the different (distinct) replacement costs of the fil
 
 Question: What's the lowest replacement cost?
 
-Answer: 9.99*/
+Answer: 9.99
+*/
 
 SELECT DISTINCT
 replacement_cost
@@ -251,6 +252,18 @@ Question: What is the daily average revenue of all Sundays?
 
 Answer: 1410.65
 */
+SELECT
+AVG(revenue)
+FROM
+(
+SELECT 
+SUM(amount) as revenue,
+	DATE(payment_date),
+EXTRACT (dow from payment_date) as daily
+FROM payment
+	WHERE EXTRACT (dow from payment_date) = 0
+GROUP BY DATE(payment_date), daily ) ;
+
 
 /*
 Question 11:
@@ -265,6 +278,15 @@ Question: Which two movies are the shortest on that list and how long are they?
 
 Answer: CELEBRITY HORN and SEATTLE EXPECTATIONS with 110 minutes.
 */
+SELECT title, length FROM film a
+WHERE length > (
+	SELECT AVG(length) FROM film b
+	WHERE a.replacement_cost = b.replacement_cost
+	
+)
+ORDER BY length ASC
+LIMIT 2;
+
 
 /*
 Question 12:
@@ -285,6 +307,16 @@ Question: Which district has the highest average customer lifetime value?
 Answer: Saint-Denis with an average customer lifetime value of 216.54.
 */
 
+SELECT district, AVG(revenue) FROM address a
+LEFT JOIN customer b
+ON a.address_id = b.address_id
+INNER JOIN (
+SELECT customer_id, SUM(amount) as revenue FROM payment
+GROUP BY customer_id) c
+ON b.customer_id = c.customer_id
+GROUP BY district
+ORDER BY 2 DESC
+LIMIT 1;
 /*
 Question 13:
 
@@ -298,7 +330,36 @@ Question: What is the total revenue of the category 'Action' and what is the low
 
 Answer: Total revenue in the category 'Action' is 4375.85 and the lowest payment_id in that category is 16055.
 */
+SELECT 
+title,payment_id, amount, name, 
+(SELECT SUM(amount)
+FROM category c1
+INNER jOIN film_category b
+ON c1.category_id = b.category_id
+INNER JOIN film z
+ON b.film_id = z.film_id
+INNER JOIN inventory c
+ON z.film_id = c.film_id
+INNER JOIN rental d
+ON c.inventory_id = d.inventory_id
+INNER JOIN payment e
+ON d.customer_id = e.customer_id
+WHERE c1.name=a.name)
 
+FROM category a
+INNER jOIN film_category b
+ON a.category_id = b.category_id
+INNER JOIN film z
+ON b.film_id = z.film_id
+INNER JOIN inventory c
+ON z.film_id = c.film_id
+INNER JOIN rental d
+ON c.inventory_id = d.inventory_id
+INNER JOIN payment e
+ON d.customer_id = e.customer_id
+WHERE name = 'Action' 
+GROUP BY payment_id, title, amount, name
+ORDER BY name ASC, payment_id ASC;
 /*
 Bonus question 14:
 
